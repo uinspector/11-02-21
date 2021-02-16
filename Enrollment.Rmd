@@ -17,8 +17,14 @@ x
 ```{r}
 x %>% 
   clean_names() %>% 
-  group_by(total) %>% 
-  arrange(desc(total)) %>% 
-  slice(1:10)
+  drop_na(course_name) %>% 
+  select(course_id, course_name, total) %>% 
+  group_by(course_id, course_name) %>% 
+  summarize(sum_total = sum(total), .groups = "drop") %>% 
+  arrange(desc(sum_total)) %>% 
+  slice(1:10) %>% 
+  ggplot(mapping = aes(x = course_name, y = sum_total)) +
+  geom_col()
+  
 ```
 
