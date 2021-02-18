@@ -11,24 +11,40 @@ library(janitor)
 ```
 
 ```{r}
+# When dealing with excel files, load the readxl library and use the read_excel function with the argument path to make it into a tibble
+
 x <- read_excel(path = "raw_data/class_enrollment_summary_by_term_2-10-2021.xlsx", skip = 3)
-x
 ```
 ```{r}
+# Clean names used to clean up all the strange names when you're dealing with weird looking course ids and names and titles etc.
+
 x %>% 
   clean_names() %>% 
   drop_na(course_name) %>% 
+  
+# Because you're measuring the total enrollment you will need both course_id and course_name, many courses might have the same name, ensure ID is included.
+  
   select(course_id, course_name, total) %>% 
   group_by(course_id, course_name) %>% 
   summarize(sum_total = sum(total), .groups = "drop") %>% 
+  
+# .groups = "Drop" gets rid of all previous groupings, very important in this case for the plot!
+  
   arrange(desc(sum_total)) %>% 
   slice(1:10) %>% 
   ggplot(mapping = aes(x = fct_reorder(course_name, sum_total), y = sum_total, fill = sum_total)) +
+  
+# Fill needs to be attached to some sort of variable!
+  
   geom_col() +
+  
+# X axis was waaaay too crowded, needed coord flip to make the plot intelligible, remember to experiment with different axes.
+  
   coord_flip() +
   labs(title = "Top Ten Most Popular Classes at Harvard",
        x = " ",
-       y = "Total Enrollment") +
+       y = "Total Enrollment",
+       caption = "Source: Harvard Registrar") +
   theme_classic()
   
 ```
