@@ -23,8 +23,13 @@ x %>%
   summarize(sum_total = sum(total), .groups = "drop") %>% 
   arrange(desc(sum_total)) %>% 
   slice(1:10) %>% 
-  ggplot(mapping = aes(x = course_name, y = sum_total)) +
-  geom_col()
+  ggplot(mapping = aes(x = fct_reorder(course_name, sum_total), y = sum_total, fill = sum_total)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Top Ten Most Popular Classes at Harvard",
+       x = " ",
+       y = "Total Enrollment") +
+  theme_classic()
   
 ```
 
